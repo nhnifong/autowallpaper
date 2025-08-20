@@ -11,6 +11,8 @@ import androidx.car.app.CarContext
 import androidx.car.app.Screen
 import androidx.car.app.SurfaceCallback
 import androidx.car.app.SurfaceContainer
+import androidx.car.app.model.Action
+import androidx.car.app.model.ActionStrip
 import androidx.car.app.model.Template
 import androidx.car.app.navigation.model.NavigationTemplate
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -81,9 +83,13 @@ class ImageDisplayScreen(carContext: CarContext) : Screen(carContext) {
     }
 
     override fun onGetTemplate(): Template {
-        // The NavigationTemplate can be built without any extra elements.
-        // The crash you saw before was likely due to another issue that is now resolved.
+        // The NavigationTemplate requires a a UI element to be valid.
+        val actionStrip = ActionStrip.Builder()
+            .addAction(Action.APP_ICON)
+            .build()
+
         return NavigationTemplate.Builder()
+            .setActionStrip(actionStrip) // Set the built ActionStrip
             .build()
     }
 
