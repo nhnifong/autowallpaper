@@ -1,4 +1,4 @@
-package com.example.autowallpaper
+package com.neufangled.autowallpaper
 
 import org.junit.Test
 

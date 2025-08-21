@@ -1,4 +1,4 @@
-package com.example.autowallpaper
+package com.neufangled.autowallpaper
 
 import androidx.car.app.CarAppService
 import androidx.car.app.Session

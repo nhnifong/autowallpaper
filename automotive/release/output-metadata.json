@@ -4,7 +4,7 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "com.example.autowallpaper",
+  "applicationId": "com.neufangled.autowallpaper",
   "variantName": "release",
   "elements": [
     {

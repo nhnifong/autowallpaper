@@ -1,4 +1,4 @@
-package com.example.autowallpaper
+package com.neufangled.autowallpaper
 
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
@@ -20,7 +20,7 @@ import androidx.car.app.navigation.model.RoutingInfo
 import androidx.core.graphics.drawable.IconCompat
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import com.example.autowallpaper.R // Import the R class
+import com.neufangled.autowallpaper.R // Import the R class
 
 /**
  * This screen uses the NavigationTemplate to get a raw Surface to draw on,

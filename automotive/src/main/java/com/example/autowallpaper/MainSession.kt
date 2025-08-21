@@ -1,4 +1,4 @@
-package com.example.autowallpaper
+package com.neufangled.autowallpaper
 
 import android.content.Intent
 import androidx.car.app.Screen

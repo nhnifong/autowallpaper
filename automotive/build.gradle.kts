@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.autowallpaper"
+    namespace = "com.neufangled.autowallpaper"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.autowallpaper"
+        applicationId = "com.neufangled.autowallpaper"
         minSdk = 28
         targetSdk = 36
         versionCode = 1
