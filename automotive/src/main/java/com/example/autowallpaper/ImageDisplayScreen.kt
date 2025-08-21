@@ -13,24 +13,28 @@ import androidx.car.app.SurfaceCallback
 import androidx.car.app.SurfaceContainer
 import androidx.car.app.model.Action
 import androidx.car.app.model.ActionStrip
+import androidx.car.app.model.CarIcon
 import androidx.car.app.model.Template
 import androidx.car.app.navigation.model.NavigationTemplate
+import androidx.car.app.navigation.model.RoutingInfo
+import androidx.core.graphics.drawable.IconCompat
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-
-import com.example.autowallpaper.R
+import com.example.autowallpaper.R // Import the R class
 
 /**
  * This screen uses the NavigationTemplate to get a raw Surface to draw on,
  * bypassing the normal image size restrictions for a high-resolution display.
  *
- * This version uses the correct AppManager.setSurfaceCallback API.
+ * This version uses the correct AppManager.setSurfaceCallback API and cycles images.
  */
 class ImageDisplayScreen(carContext: CarContext) : Screen(carContext) {
 
     private var surface: Surface? = null
-    // This will now store the full screen dimensions, not just the "safe" area.
     private var fullScreenRect: Rect? = null
+    private var currentImageIndex = 0
+    private val imageResources: List<Int>
+
     private val textPaint = Paint().apply {
         color = Color.WHITE
         textSize = 40f
@@ -38,7 +42,6 @@ class ImageDisplayScreen(carContext: CarContext) : Screen(carContext) {
         textAlign = Paint.Align.CENTER
         setShadowLayer(5f, 2f, 2f, Color.BLACK) // Add a shadow for readability
     }
-
 
     // The SurfaceCallback handles all surface-related events.
     private val surfaceCallback = object : SurfaceCallback {
@@ -50,32 +53,32 @@ class ImageDisplayScreen(carContext: CarContext) : Screen(carContext) {
         }
 
         override fun onVisibleAreaChanged(visibleArea: Rect) {
-            // We are intentionally ignoring the safe "visibleArea" to draw fullscreen.
-            // Redraw in case the surface itself was resized.
             drawBitmapToSurface()
         }
 
         override fun onStableAreaChanged(stableArea: Rect) {
-            // We are also ignoring the "stableArea".
             drawBitmapToSurface()
         }
 
         override fun onSurfaceDestroyed(surfaceContainer: SurfaceContainer) {
-            // The surface is gone. Nullify it.
             surface = null
         }
     }
 
     init {
+        // Dynamically find all image resources named image1, image2, etc., up to image10.
+        imageResources = (1..10).mapNotNull { i ->
+            val resourceId = carContext.resources.getIdentifier("image$i", "drawable", carContext.packageName)
+            if (resourceId != 0) resourceId else null
+        }
+
         // Use a lifecycle observer to correctly manage the SurfaceCallback.
         lifecycle.addObserver(object : DefaultLifecycleObserver {
             override fun onResume(owner: LifecycleOwner) {
-                // When the screen is resumed, register the callback with the AppManager.
                 carContext.getCarService(AppManager::class.java).setSurfaceCallback(surfaceCallback)
             }
 
             override fun onPause(owner: LifecycleOwner) {
-                // When the screen is paused, unregister the callback to prevent leaks.
                 carContext.getCarService(AppManager::class.java).setSurfaceCallback(null)
                 surface = null // Surface is no longer valid.
             }
@@ -83,45 +86,60 @@ class ImageDisplayScreen(carContext: CarContext) : Screen(carContext) {
     }
 
     override fun onGetTemplate(): Template {
-        // The NavigationTemplate requires a a UI element to be valid.
+        // Create an action to cycle through the images.
+        val cycleImageAction = Action.Builder()
+            .setIcon(
+                CarIcon.Builder(
+                    IconCompat.createWithResource(
+                        carContext,
+                        R.drawable.icon
+                    )
+                ).build()
+            )
+            .setOnClickListener {
+                if (imageResources.isNotEmpty()) {
+                    // Move to the next image, looping back to the start if at the end.
+                    currentImageIndex = (currentImageIndex + 1) % imageResources.size
+                    // Redraw the surface with the new image.
+                    drawBitmapToSurface()
+                }
+            }
+            .build()
+
         val actionStrip = ActionStrip.Builder()
-            .addAction(Action.APP_ICON)
+            .addAction(cycleImageAction)
             .build()
 
         return NavigationTemplate.Builder()
-            .setActionStrip(actionStrip) // Set the built ActionStrip
+            .setActionStrip(actionStrip)
             .build()
     }
 
     private fun drawBitmapToSurface() {
-        // Ensure we have a valid surface and a drawing area.
         val localSurface = surface ?: return
         val destinationRect = fullScreenRect ?: return
-        if (!localSurface.isValid) {
-            return // Don't draw on an invalid surface
+        if (!localSurface.isValid || imageResources.isEmpty()) {
+            return // Don't draw if there's no surface or no images.
         }
 
-        // Lock the canvas to get a drawing surface.
         val canvas: Canvas = localSurface.lockCanvas(null) ?: return
 
         try {
-            // Load your high-resolution image from drawables.
-            val bitmap = BitmapFactory.decodeResource(carContext.resources, R.drawable.image)
+            // Load the current high-resolution image from drawables.
+            val bitmap = BitmapFactory.decodeResource(carContext.resources, imageResources[currentImageIndex])
 
-            // Define the source (the whole bitmap) and destination (the full screen).
             val sourceRect = Rect(0, 0, bitmap.width, bitmap.height)
 
             // Draw the bitmap to the canvas, scaling it to fit the full screen.
             canvas.drawBitmap(bitmap, sourceRect, destinationRect, null)
 
             // Prepare and draw the resolution text on top of the image.
-            val resolutionText = "${destinationRect.width()} x ${destinationRect.height()}"
-            val textX = destinationRect.centerX().toFloat()
-            val textY = destinationRect.centerY().toFloat()
-            canvas.drawText(resolutionText, textX, textY, textPaint)
+//            val resolutionText = "${destinationRect.width()} x ${destinationRect.height()}"
+//            val textX = destinationRect.centerX().toFloat()
+//            val textY = destinationRect.centerY().toFloat()
+//            canvas.drawText(resolutionText, textX, textY, textPaint)
 
         } finally {
-            // Unlock the canvas and post the new content to the screen.
             localSurface.unlockCanvasAndPost(canvas)
         }
     }
