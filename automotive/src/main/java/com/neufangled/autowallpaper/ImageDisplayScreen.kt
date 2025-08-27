@@ -23,7 +23,6 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.neufangled.autowallpaper.R
 import java.io.FileNotFoundException
 
 // Data classes for storing wallpaper items with crop information
@@ -46,7 +45,6 @@ class ImageDisplayScreen(carContext: CarContext) : Screen(carContext) {
         const val KEY_WALLPAPER_ITEMS = "wallpaper_items"
         const val KEY_CAR_DISPLAY_WIDTH = "car_display_width_default_car"
         const val KEY_CAR_DISPLAY_HEIGHT = "car_display_height_default_car"
-        const val DEFAULT_CAR_ID = "default_car" // For now, only one car
     }
 
     private val textPaint = Paint().apply {

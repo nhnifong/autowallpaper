@@ -50,7 +50,7 @@ class CropImageActivity : AppCompatActivity() {
         }
 
         // Load car display dimensions
-        val prefs = getSharedPreferences(ImageDisplayScreen.PREFS_NAME, Context.MODE_PRIVATE)
+        val prefs = getSharedPreferences(ImageDisplayScreen.PREFS_NAME, MODE_PRIVATE)
         val carDisplayWidth = prefs.getInt(ImageDisplayScreen.KEY_CAR_DISPLAY_WIDTH, 0)
         val carDisplayHeight = prefs.getInt(ImageDisplayScreen.KEY_CAR_DISPLAY_HEIGHT, 0)
 
@@ -98,7 +98,7 @@ class CropImageActivity : AppCompatActivity() {
         }
 
         cancelButton.setOnClickListener {
-            setResult(Activity.RESULT_CANCELED)
+            setResult(RESULT_CANCELED)
             finish()
         }
     }
@@ -110,7 +110,7 @@ class CropImageActivity : AppCompatActivity() {
             return
         }
 
-        val prefs = getSharedPreferences(ImageDisplayScreen.PREFS_NAME, Context.MODE_PRIVATE)
+        val prefs = getSharedPreferences(ImageDisplayScreen.PREFS_NAME, MODE_PRIVATE)
         val jsonString = prefs.getString(ImageDisplayScreen.KEY_WALLPAPER_ITEMS, null)
         val type = object : TypeToken<MutableList<WallpaperItem>>() {}.type
         val wallpaperItems: MutableList<WallpaperItem> = if (jsonString != null) {
@@ -135,7 +135,7 @@ class CropImageActivity : AppCompatActivity() {
         Toast.makeText(this, "Wallpaper updated!", Toast.LENGTH_SHORT).show()
         val resultIntent = Intent()
         resultIntent.putExtra(RESULT_CROP_SUCCESSFUL, true)
-        setResult(Activity.RESULT_OK, resultIntent)
+        setResult(RESULT_OK, resultIntent)
         finish()
     }
 }

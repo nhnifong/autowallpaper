@@ -6,7 +6,6 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Matrix
 import android.graphics.Paint
-import android.graphics.PointF
 import android.graphics.Rect
 import android.graphics.RectF
 import android.util.AttributeSet
@@ -160,8 +159,6 @@ class CropOverlayView @JvmOverloads constructor(
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        val carAR = carDisplayAspectRatio ?: return false // Don't handle if no aspect ratio
-
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 if (cropRect.contains(event.x, event.y)) {
@@ -177,15 +174,13 @@ class CropOverlayView @JvmOverloads constructor(
 
                 val newLeft = cropRect.left + dx
                 val newTop = cropRect.top + dy
-                var newRight = newLeft + cropRect.width()
-                var newBottom = newTop + cropRect.height()
 
                 // Ensure cropRect stays within the displayedImageRect bounds
                 val finalNewLeft = max(displayedImageRect.left, min(newLeft, displayedImageRect.right - cropRect.width()))
                 val finalNewTop = max(displayedImageRect.top, min(newTop, displayedImageRect.bottom - cropRect.height()))
                 
-                newRight = finalNewLeft + cropRect.width()
-                newBottom = finalNewTop + cropRect.height()
+                var newRight = finalNewLeft + cropRect.width()
+                var newBottom = finalNewTop + cropRect.height()
 
                 cropRect.set(finalNewLeft, finalNewTop, newRight, newBottom)
 
@@ -207,18 +202,6 @@ class CropOverlayView @JvmOverloads constructor(
         // Transformation matrix from ImageView to actual bitmap
         val matrix = Matrix()
         iv.imageMatrix.invert(matrix) // Get the inverse matrix
-
-        // Create a RectF for the crop rectangle in view coordinates
-        val viewCropRect = RectF(cropRect)
-
-        // Map this rectangle using the inverse matrix
-        // This is tricky because cropRect is relative to the *displayed* image, not the *view* if there are offsets.
-        // We need to transform cropRect (which is in the coordinate system of the ImageView's canvas,
-        // specifically aligned with how the image is displayed via fitCenter) to the original
-        // bitmap's coordinate system.
-
-        // displayedImageRect gives us the location and size of the image as it's drawn by fitCenter.
-        // cropRect is currently in the same coordinate system as displayedImageRect (i.e., view coordinates).
 
         // Calculate scale factor used by fitCenter
         val viewWidth = iv.width.toFloat()

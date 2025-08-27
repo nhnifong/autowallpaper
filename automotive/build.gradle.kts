@@ -44,11 +44,11 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation("androidx.car.app:app:1.7.0")
     implementation("androidx.car.app:app-projected:1.7.0")
-    implementation("com.google.android.material:material:1.12.0") // Added Material Components
-    implementation("com.github.bumptech.glide:glide:4.16.0") // Added Glide
-    implementation("androidx.activity:activity-ktx:1.9.0") // Required for Photo Picker
-    implementation("com.google.code.gson:gson:2.10.1") // Added Gson for JSON serialization
-    annotationProcessor("com.github.bumptech.glide:compiler:4.12.0") // Added Glide compiler
+    implementation("com.google.android.material:material:1.12.0")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation("androidx.activity:activity-ktx:1.10.0")
+    implementation("com.google.code.gson:gson:2.13.1")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
