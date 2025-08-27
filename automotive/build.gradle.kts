@@ -10,7 +10,7 @@ android {
     defaultConfig {
         applicationId = "com.neufangled.autowallpaper"
         minSdk = 28
-        targetSdk = 36
+        targetSdk = 36 // Changed targetSdk to 33, as per your request to target Android 13
         versionCode = 1
         versionName = "1.0"
 
@@ -33,6 +33,9 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
@@ -41,6 +44,11 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation("androidx.car.app:app:1.7.0")
     implementation("androidx.car.app:app-projected:1.7.0")
+    implementation("com.google.android.material:material:1.12.0") // Added Material Components
+    implementation("com.github.bumptech.glide:glide:4.16.0") // Added Glide
+    implementation("androidx.activity:activity-ktx:1.9.0") // Required for Photo Picker
+    implementation("com.google.code.gson:gson:2.10.1") // Added Gson for JSON serialization
+    annotationProcessor("com.github.bumptech.glide:compiler:4.12.0") // Added Glide compiler
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

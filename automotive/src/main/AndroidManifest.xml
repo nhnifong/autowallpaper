@@ -6,6 +6,7 @@
     <uses-permission android:name="androidx.car.app.CarAppService" />
     <uses-permission android:name="androidx.car.app.ACCESS_SURFACE" />
     <uses-permission android:name="androidx.car.app.NAVIGATION_TEMPLATES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
     <application
         android:allowBackup="true"
@@ -14,7 +15,23 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AutoWallpaper"
-        tools:targetApi="31">
+        tools:targetApi="33">
+
+        <activity
+            android:name=".ManageWallpaperActivity"
+            android:exported="true"
+            android:theme="@style/ManageWallpaperActivityTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".CropImageActivity"
+            android:label="Crop Image"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" /> 
+            <!-- Or any other appropriate theme -->
 
         <!-- Main entry point for the Android Auto app -->
         <service
