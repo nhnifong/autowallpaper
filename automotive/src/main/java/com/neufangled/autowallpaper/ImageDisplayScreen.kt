@@ -45,6 +45,7 @@ class ImageDisplayScreen(carContext: CarContext) : Screen(carContext) {
         const val KEY_WALLPAPER_ITEMS = "wallpaper_items"
         const val KEY_CAR_DISPLAY_WIDTH = "car_display_width_default_car"
         const val KEY_CAR_DISPLAY_HEIGHT = "car_display_height_default_car"
+        const val KEY_CURRENT_IMAGE_INDEX = "current_image_index" // New key
     }
 
     private val textPaint = Paint().apply {
@@ -90,7 +91,7 @@ class ImageDisplayScreen(carContext: CarContext) : Screen(carContext) {
 
         lifecycle.addObserver(object : DefaultLifecycleObserver {
             override fun onResume(owner: LifecycleOwner) {
-                loadAndPrepareWallpaperItems()
+                loadAndPrepareWallpaperItems() // Ensure items and index are loaded on resume
                 carContext.getCarService(AppManager::class.java).setSurfaceCallback(surfaceCallback)
             }
 
@@ -110,22 +111,26 @@ class ImageDisplayScreen(carContext: CarContext) : Screen(carContext) {
         } else {
             wallpaperItems = emptyList()
         }
-        currentImageIndex = 0 // Reset index when items are reloaded
+
+        // Load and constrain currentImageIndex
+        if (wallpaperItems.isNotEmpty()) {
+            currentImageIndex = prefs.getInt(KEY_CURRENT_IMAGE_INDEX, 0)
+            if (currentImageIndex < 0 || currentImageIndex >= wallpaperItems.size) {
+                currentImageIndex = 0 // Reset if out of bounds
+            }
+        } else {
+            currentImageIndex = 0 // Reset if no items
+        }
     }
 
     override fun onGetTemplate(): Template {
         val cycleImageAction = Action.Builder()
-            .setIcon(
-                CarIcon.Builder(
-                    IconCompat.createWithResource(
-                        carContext,
-                        R.drawable.icon // Ensure this drawable exists
-                    )
-                ).build()
-            )
             .setOnClickListener {
                 if (wallpaperItems.isNotEmpty()) {
                     currentImageIndex = (currentImageIndex + 1) % wallpaperItems.size
+                    // Save the new index
+                    val prefs = carContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                    prefs.edit().putInt(KEY_CURRENT_IMAGE_INDEX, currentImageIndex).apply()
                     drawBitmapToSurface()
                 }
             }
@@ -151,6 +156,14 @@ class ImageDisplayScreen(carContext: CarContext) : Screen(carContext) {
         val canvas: Canvas = localSurface.lockCanvas(null) ?: return
 
         try {
+            // Ensure currentImageIndex is valid before accessing wallpaperItems
+            if (currentImageIndex < 0 || currentImageIndex >= wallpaperItems.size) {
+                 if (wallpaperItems.isNotEmpty()) currentImageIndex = 0 else {
+                    localSurface.unlockCanvasAndPost(canvas) // unlock before early return
+                    return
+                 }
+            }
+
             val currentWallpaperItem = wallpaperItems[currentImageIndex]
             val currentUri = Uri.parse(currentWallpaperItem.uriString)
 
